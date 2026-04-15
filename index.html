@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator ID Card TKA 2026 - Rohiman Supriyadi</title>
+    <title>Generator ID Card TKA 2026 - By Rohiman Supriyadi</title>
     <style>
         :root {
             --card-width: 7cm;
             --card-height: 11cm;
         }
 
-        /* PAKSA WARNA MUNCUL SAAT DI PRINT */
+        /* MEMASTIKAN WARNA TETAP SAMA SAAT DICETAK */
         * { 
             box-sizing: border-box; 
             -webkit-print-color-adjust: exact !important; 
             print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
         
         body {
@@ -24,7 +25,7 @@
             padding: 20px;
         }
 
-        /* --- DASHBOARD --- */
+        /* --- DASHBOARD CONTROL --- */
         #admin-panel {
             max-width: 900px;
             margin: 0 auto 30px;
@@ -32,14 +33,16 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
         }
 
-        .creator {
+        .creator-credit {
             font-size: 11px;
             color: #888;
             text-align: right;
+            margin-top: -10px;
+            margin-bottom: 15px;
             font-style: italic;
-            margin-bottom: 10px;
         }
 
         .form-grid {
@@ -49,16 +52,16 @@
         }
 
         .input-group { display: flex; flex-direction: column; margin-bottom: 10px; }
-        label { font-weight: bold; font-size: 13px; margin-bottom: 5px; }
+        label { font-weight: bold; font-size: 13px; margin-bottom: 5px; color: #333; }
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
 
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .button-group { display: flex; gap: 10px; margin-top: 20px; }
         .btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; }
         .btn-add { background: #28a745; }
         .btn-print { background: #007bff; }
         .btn-reset { background: #dc3545; }
 
-        /* --- CARD STYLE --- */
+        /* --- PREVIEW AREA ON SCREEN --- */
         #print-area {
             display: flex;
             flex-wrap: wrap;
@@ -66,6 +69,7 @@
             justify-content: center;
         }
 
+        /* --- THE CARD DESIGN --- */
         .id-card {
             width: var(--card-width);
             height: var(--card-height);
@@ -73,10 +77,12 @@
             overflow: hidden;
             background-color: #fff;
             border: 1px solid #ddd;
+            border-radius: 2px;
             color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
+        /* TEMA WARNA (DIPASTIKAN TETAP SAAT PRINT) */
         .theme-orange { --primary: #b85a1f; --secondary: #9a9a9a; --accent: #ffffff; }
         .theme-green { --primary: #58823b; --secondary: #4472c4; --accent: #f39c12; }
 
@@ -110,8 +116,8 @@
             padding-top: 12px;
         }
 
-        .card-header h1 { font-size: 34px; margin: 0; font-weight: 900; }
-        .card-header p { font-size: 10px; font-weight: bold; margin: 2px 0; }
+        .card-header h1 { font-size: 34px; margin: 0; font-weight: 900; letter-spacing: 1px; }
+        .card-header p { font-size: 10px; margin: 2px 0; font-weight: bold; line-height: 1.1; }
 
         .jabatan-badge {
             position: relative;
@@ -120,20 +126,25 @@
             color: #fff !important;
             width: 90%;
             margin: 8px auto;
-            padding: 8px 4px;
+            padding: 6px 4px;
             border-radius: 10px;
             border: 2px solid #fff;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 900;
             text-align: center;
+            text-transform: uppercase;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .photo-box {
             position: relative;
-            margin: 5px auto;
+            margin: 10px auto 5px;
             width: 3.2cm;
             height: 4.2cm;
-            background: #eee;
+            background: #fff !important;
             border: 1px solid #000;
             z-index: 15;
             overflow: hidden;
@@ -153,57 +164,73 @@
         .info-name {
             font-size: 13px;
             border-bottom: 2px dotted #000;
-            margin-bottom: 4px;
             padding-bottom: 2px;
+            margin-bottom: 5px;
             text-transform: uppercase;
+            min-height: 18px;
         }
 
         .info-nip {
             font-size: 12px;
             border-bottom: 2px dotted #000;
             padding-bottom: 2px;
+            min-height: 18px;
         }
 
         .card-footer {
             position: absolute;
-            bottom: 10px;
+            bottom: 8px;
             width: 100%;
             z-index: 20;
             padding: 0 15px;
             color: #000 !important;
+        }
+
+        .footer-logo-area {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .logo-img { height: 35px; width: 35px; object-fit: contain; }
-        .footer-brand { font-size: 9px; font-weight: bold; line-height: 1.1; }
+        .custom-logo { height: 32px; width: 32px; object-fit: contain; }
+        .footer-brand { font-size: 9px; line-height: 1.1; font-weight: bold; }
 
-        /* --- PRINT SETTINGS (4 KARTU / A4) --- */
+        /* --- PRINT LOGIC (A4 4-KARTU) --- */
         @media print {
-            @page { size: A4; margin: 0.5cm; }
+            @page {
+                size: A4;
+                margin: 0.5cm;
+            }
+
             body { padding: 0; background: none; }
-            #admin-panel, .hint { display: none; }
+            #admin-panel, .footer-note { display: none; }
+
             #print-area {
                 display: grid;
                 grid-template-columns: repeat(2, 7cm);
                 grid-auto-rows: 11cm;
                 gap: 15px;
                 justify-content: center;
+                margin: 1cm auto;
             }
-            .id-card { box-shadow: none; border: 0.1mm solid #ccc; }
+
+            .id-card {
+                border: 0.1mm solid #ddd;
+                page-break-inside: avoid;
+                box-shadow: none;
+            }
         }
     </style>
 </head>
 <body>
 
     <div id="admin-panel">
-        <div class="creator">Created by Rohiman Supriyadi</div>
-        <h2 style="margin-top:0">Panel Generator Kartu TKA 2026</h2>
+        <div class="creator-credit">Created by Rohiman Supriyadi</div>
+        <h2 style="margin-top:0; color: #003366;">Generator ID Card TKA 2026</h2>
         
         <div class="form-grid">
             <div class="input-group">
-                <label>Judul Kartu</label>
+                <label>Judul Atas</label>
                 <input type="text" id="in-judul" value="TKA 2026">
             </div>
             <div class="input-group">
@@ -220,7 +247,7 @@
                 </select>
             </div>
             <div class="input-group">
-                <label>Pilih Warna</label>
+                <label>Pilihan Tema</label>
                 <select id="in-tema">
                     <option value="theme-orange">Oranye (Varian 1)</option>
                     <option value="theme-green">Hijau (Varian 2)</option>
@@ -228,105 +255,109 @@
             </div>
             <div class="input-group">
                 <label>Nama Lengkap</label>
-                <input type="text" id="in-nama" placeholder="Contoh: IKA KOMALASARI, S.Pd">
+                <input type="text" id="in-nama" placeholder="IKA KOMALASARI, S.Pd">
             </div>
             <div class="input-group">
                 <label>NIP</label>
-                <input type="text" id="in-nip" placeholder="Contoh: 19800101...">
+                <input type="text" id="in-nip" placeholder="19XXXXXXXXXXXXXX">
             </div>
             <div class="input-group">
                 <label>Foto Panitia</label>
                 <input type="file" id="in-foto" accept="image/*">
             </div>
+            <div class="input-group">
+                <label>Logo Footer</label>
+                <input type="file" id="in-logo" accept="image/*">
+            </div>
         </div>
 
-        <div class="btn-group">
+        <div class="button-group">
             <button class="btn btn-add" onclick="tambahKartu()">Tambahkan ke Daftar</button>
             <button class="btn btn-print" onclick="window.print()">Cetak (4 Kartu/A4)</button>
-            <button class="btn btn-reset" onclick="resetDaftar()">Reset Semua</button>
+            <button class="btn btn-reset" onclick="resetDaftar()">Bersihkan Daftar</button>
         </div>
     </div>
 
     <div id="print-area"></div>
-    <p class="hint" style="text-align:center; color:#888; font-size:12px;">Tips: Pastikan "Background Graphics" dicentang saat mencetak.</p>
+
+    <div class="footer-note" style="text-align:center; font-size: 11px; color: #999; margin-top: 20px;">
+        Pastikan opsi "Background Graphics" dicentang pada pengaturan print agar hasil maksimal.
+    </div>
 
     <script>
-        let dataPanitia = [];
-        let tempFoto = "";
-
-        // DATA BASE64 LOGO TUT WURI HANDAYANI (Agar tidak kedap-kedip & muncul instan)
-        const LOGO_TUTWURI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAADFaiHFAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURf///8zMzP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///wAAACH5BAEAAAIALAAAAAAIAAgAAAIPlI+pywnvdpx0vstzXwAAOw=="; 
-        // Note: Saya menggunakan placeholder Base64 di atas. Di sistem asli, saya telah menyematkan kode gambar Tut Wuri yang valid di bawah.
-
-        // REAL LOGO DATA (Official High Quality Tut Wuri Handayani)
-        const logoFinal = "https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_Tut_Wuri_Handayani.png";
+        let listData = [];
+        let fotoData = "";
+        let logoData = "https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_Tut_Wuri_Handayani.png";
 
         document.getElementById('in-foto').addEventListener('change', function(e) {
             const reader = new FileReader();
-            reader.onload = function() { tempFoto = reader.result; };
+            reader.onload = function() { fotoData = reader.result; };
+            if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+        });
+
+        document.getElementById('in-logo').addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function() { logoData = reader.result; };
             if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
         });
 
         function tambahKartu() {
             const nama = document.getElementById('in-nama').value;
-            if(!nama) return alert("Isi nama terlebih dahulu!");
+            if(!nama) return alert("Mohon isi nama terlebih dahulu.");
 
-            const obj = {
+            const data = {
                 id: Date.now(),
                 judul: document.getElementById('in-judul').value,
                 jabatan: document.getElementById('in-jabatan').value,
                 tema: document.getElementById('in-tema').value,
                 nama: nama,
                 nip: document.getElementById('in-nip').value,
-                foto: tempFoto || "https://via.placeholder.com/150x200?text=FOTO"
+                foto: fotoData || "https://via.placeholder.com/150x200?text=FOTO",
+                logo: logoData
             };
 
-            dataPanitia.push(obj);
-            render();
-            document.getElementById('in-nama').value = "";
-            document.getElementById('in-nip').value = "";
+            listData.push(data);
+            renderKartu();
+            // Clear input
+            document.getElementById('in-nama').value = ""; 
+            document.getElementById('in-nip').value = ""; 
         }
 
         function resetDaftar() {
-            if(confirm("Hapus semua daftar?")) {
-                dataPanitia = [];
-                render();
+            if(confirm("Hapus semua kartu dalam daftar?")) {
+                listData = [];
+                renderKartu();
             }
         }
 
-        function render() {
-            const area = document.getElementById('print-area');
-            area.innerHTML = "";
+        function renderKartu() {
+            const container = document.getElementById('print-area');
+            container.innerHTML = "";
 
-            dataPanitia.forEach(p => {
-                area.innerHTML += `
-                    <div class="id-card ${p.tema}">
+            listData.forEach(item => {
+                container.innerHTML += `
+                    <div class="id-card ${item.tema}">
                         <div class="bg-top"></div>
                         <div class="bg-bottom"></div>
                         <div class="bg-accent-line"></div>
-                        
                         <div class="card-header">
-                            <h1>${p.judul}</h1>
+                            <h1>${item.judul}</h1>
                             <p>TES KEMAMPUAN AKADEMIK</p>
                             <p>TAHUN PELAJARAN 2025/2026</p>
                         </div>
-
-                        <div class="jabatan-badge">${p.jabatan}</div>
-
-                        <div class="photo-box">
-                            <img src="${p.foto}">
-                        </div>
-
+                        <div class="jabatan-badge">${item.jabatan}</div>
+                        <div class="photo-box"><img src="${item.foto}"></div>
                         <div class="identity-box">
-                            <div class="info-name">${p.nama}</div>
-                            <div class="info-nip">NIP. ${p.nip || '................................'}</div>
+                            <div class="info-name">${item.nama}</div>
+                            <div class="info-nip">NIP. ${item.nip || '................................'}</div>
                         </div>
-
                         <div class="card-footer">
-                            <img src="${logoFinal}" class="logo-img">
-                            <div class="footer-brand">
-                                PUSMENDIK<br>
-                                <span style="font-weight:normal; font-size:7px;">Pusat Asesmen Pendidikan</span>
+                            <div class="footer-logo-area">
+                                <img src="${item.logo}" class="custom-logo">
+                                <div class="footer-brand">
+                                    PUSMENDIK<br>
+                                    <span style="font-weight:normal; font-size:7px;">Pusat Asesmen Pendidikan</span>
+                                </div>
                             </div>
                         </div>
                     </div>
