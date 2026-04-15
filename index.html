@@ -82,7 +82,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        /* TEMA WARNA (DIPASTIKAN TETAP SAAT PRINT) */
+        /* TEMA WARNA */
         .theme-orange { --primary: #b85a1f; --secondary: #9a9a9a; --accent: #ffffff; }
         .theme-green { --primary: #58823b; --secondary: #4472c4; --accent: #f39c12; }
 
@@ -192,7 +192,8 @@
             gap: 10px;
         }
 
-        .custom-logo { height: 32px; width: 32px; object-fit: contain; }
+        /* LOGO TUT WURI DARI GITHUB */
+        .tutwuri-logo { height: 32px; width: 32px; object-fit: contain; }
         .footer-brand { font-size: 9px; line-height: 1.1; font-weight: bold; }
 
         /* --- PRINT LOGIC (A4 4-KARTU) --- */
@@ -234,7 +235,7 @@
                 <input type="text" id="in-judul" value="TKA 2026">
             </div>
             <div class="input-group">
-                <label>Jabatan</label>
+                <label>Pilih Jabatan</label>
                 <select id="in-jabatan">
                     <option value="PENANGGUNG JAWAB">PENANGGUNG JAWAB</option>
                     <option value="KETUA PANITIA">KETUA PANITIA</option>
@@ -262,13 +263,10 @@
                 <input type="text" id="in-nip" placeholder="19XXXXXXXXXXXXXX">
             </div>
             <div class="input-group">
-                <label>Foto Panitia</label>
+                <label>Upload Foto Panitia</label>
                 <input type="file" id="in-foto" accept="image/*">
             </div>
-            <div class="input-group">
-                <label>Logo Footer</label>
-                <input type="file" id="in-logo" accept="image/*">
-            </div>
+            <!-- Menu upload logo telah dihapus sesuai permintaan -->
         </div>
 
         <div class="button-group">
@@ -281,23 +279,20 @@
     <div id="print-area"></div>
 
     <div class="footer-note" style="text-align:center; font-size: 11px; color: #999; margin-top: 20px;">
-        Pastikan opsi "Background Graphics" dicentang pada pengaturan print agar hasil maksimal.
+        Pastikan opsi "Background Graphics" dicentang pada pengaturan print agar hasil warna maksimal.
     </div>
 
     <script>
         let listData = [];
         let fotoData = "";
-        let logoData = "https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_Tut_Wuri_Handayani.png";
+        
+        // Memanggil Logo Tut Wuri Handayani secara otomatis dari GitHub
+        const logoTutWuri = "https://raw.githubusercontent.com/RohimanSupriyadi/logo/main/tutwuri.png"; 
+        // Catatan: Jika link GitHub pribadi Anda berbeda, silakan ganti URL di atas dengan link 'Raw' foto Anda.
 
         document.getElementById('in-foto').addEventListener('change', function(e) {
             const reader = new FileReader();
             reader.onload = function() { fotoData = reader.result; };
-            if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
-        });
-
-        document.getElementById('in-logo').addEventListener('change', function(e) {
-            const reader = new FileReader();
-            reader.onload = function() { logoData = reader.result; };
             if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
         });
 
@@ -312,13 +307,11 @@
                 tema: document.getElementById('in-tema').value,
                 nama: nama,
                 nip: document.getElementById('in-nip').value,
-                foto: fotoData || "https://via.placeholder.com/150x200?text=FOTO",
-                logo: logoData
+                foto: fotoData || "https://via.placeholder.com/150x200?text=FOTO"
             };
 
             listData.push(data);
             renderKartu();
-            // Clear input
             document.getElementById('in-nama').value = ""; 
             document.getElementById('in-nip').value = ""; 
         }
@@ -353,7 +346,7 @@
                         </div>
                         <div class="card-footer">
                             <div class="footer-logo-area">
-                                <img src="${item.logo}" class="custom-logo">
+                                <img src="${logoTutWuri}" class="tutwuri-logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_Tut_Wuri_Handayani.png'">
                                 <div class="footer-brand">
                                     PUSMENDIK<br>
                                     <span style="font-weight:normal; font-size:7px;">Pusat Asesmen Pendidikan</span>
